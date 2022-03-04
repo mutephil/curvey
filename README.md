@@ -1,8 +1,9 @@
 curve dao contracts solidity translation
 
 order of operations:
-- vestingescrow
+- votingescrow
     - translate checkpoint to english 
+- vestingescrow
 - vestingescrow factory
 - feedistributer
 - maybe stop here
