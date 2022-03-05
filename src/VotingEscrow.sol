@@ -146,7 +146,7 @@ contract VotingEscrow {
     
     // @notice Check if the call is from a whitelisted smart contract, revert if not
     // @param addr Address to be checked
-    function assert_not_contract(address addr) external {
+    function assert_not_contract(address addr) internal {
         if (addr != tx.origin) {
             address checker = smart_wallet_checker;
             if (checker != address(0)) {
