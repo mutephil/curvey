@@ -66,6 +66,7 @@ contract VotingEscrow is ReentrancyGuard {
     uint256 constant WEEK = 7 * 86400;  // all future times are rounded by week
     int128 constant iMAXTIME = 4 * 365 * 86400; // 4 years
     uint256 constant MULTIPLIER = 10 ** 18;
+    bool constant allow_contract_calls = true;
 
     address public token;
     uint256 public supply;
@@ -74,7 +75,7 @@ contract VotingEscrow is ReentrancyGuard {
 
     uint256 public epoch;
     mapping(uint256 => Point) public point_history;  // epoch -> unsigned point
-    mapping(address => Point[]) public user_point_history;  // user -> Point[user_epoch]
+    mapping(address => Point[1000000000]) public user_point_history;  // user -> Point[user_epoch]
     mapping(address => uint256) public user_point_epoch;
     mapping(uint256 => int128) public slope_changes; // time -> signed slope change
 
@@ -148,6 +149,7 @@ contract VotingEscrow is ReentrancyGuard {
     // @notice Check if the call is from a whitelisted smart contract, revert if not
     // @param addr Address to be checked
     function assert_not_contract(address addr) internal {
+        if (allow_contract_calls) return;
         if (addr != tx.origin) {
             address checker = smart_wallet_checker;
             if (checker != address(0)) {
@@ -357,7 +359,7 @@ contract VotingEscrow is ReentrancyGuard {
         _checkpoint(_addr, old_locked, _locked);
 
         if (_value != 0) {
-            //require(IERC20(token).transferFrom(_addr, address(this), _value));
+            require(IERC20(token).transferFrom(_addr, address(this), _value));
         }
 
         emit Deposit(_addr, _value, _locked.end, deposit_type, block.timestamp);
@@ -428,7 +430,7 @@ contract VotingEscrow is ReentrancyGuard {
     // @dev Only possible if the lock has expired
     function withdraw() external nonReentrant {
         LockedBalance memory _locked = locked[msg.sender];
-        require(block.timestamp >= _locked.end, " The lock didn't expire");
+        require(block.timestamp >= _locked.end, "The lock didn't expire");
         uint256 value = uint256(int256(_locked.amount));
 
         LockedBalance memory old_locked = _locked;

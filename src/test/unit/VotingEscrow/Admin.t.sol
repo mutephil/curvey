@@ -53,4 +53,5 @@ contract VotingEscrowAdminTest is DSTest {
         votingEscrow.apply_transfer_ownership();
     }
 
+
 }
